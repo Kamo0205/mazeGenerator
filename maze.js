@@ -36,6 +36,13 @@ class Maze {
                 grid[r][c].show(this.size,this.rows,this.columns);
             }
         }
+
+        let next = current.checkNeighbours();
+
+        if (next) {
+            next.visited = true;
+            this.stack.push(current);
+        }
     }
 }
 
@@ -76,9 +83,9 @@ class Cell {
 
         if (neighbours.length !== 0) {
             let random = Math.floor(Math.random() * neighbours.length);
-        } else {
-            return undefined;
+            return neighbours[random];
         }
+        return undefined;
     }
 
     drawTopWall(x,y,size,columns,rows) {
@@ -107,6 +114,26 @@ class Cell {
         context.moveTo(x,y);
         context.lineTo(x,y+(size/rows));
         context.stroke();
+    }
+
+    removeWall(cell1,cell2) {
+        let x = cell1.colNum - cell2.colNum
+        if (x == 1) {
+            cell1.walls.leftWall = false;
+            cell2.walls.rightWall = false;
+        } else if (x == -1) {
+            cell1.walls.rightWall = false;
+            cell2.walls.leftWall = false;
+        }
+
+        let y = cell1.colNum - cell2.colNum;
+        if (y == 1) {
+            cell1.walls.topWall = false;
+            cell2.walls.bottomWall = false;
+        } else if (y == -1) {
+            cell1.walls.bottomWall = false;
+            cell2.walls.topWall = false;
+        }
     }
 
     show(size,rows,columns) {
