@@ -116,6 +116,13 @@ class Cell {
         context.stroke();
     }
 
+    highlight(columns) {
+        let x = (this.colNum * this.parentSize) / (columns + 1);
+        let y = (this.rowNum * this.parentSize) / (rows + 1);
+        context.fillStyle = "purple";
+        context.fillRect(x,y,this.parentSize/columns-3,this.parentSize/columns-3);
+    }
+
     removeWall(cell1,cell2) {
         let x = cell1.colNum - cell2.colNum
         if (x == 1) {
