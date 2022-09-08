@@ -42,7 +42,22 @@ class Maze {
         if (next) {
             next.visited = true;
             this.stack.push(current);
+            current.highlight(this.columns);
+            current.removeWalls(current,next);
+            current = next;
+        } else if (this.stack.length > 0) {
+            let cell = this.stack.pop();
+            current = cell;
+            current.highlight(this.columns)
         }
+
+        if (this.stack.length == 0) {
+            return;
+        }
+
+        window.requestAnimationFrame(() => {
+            this.draw();
+        })
     }
 }
 
@@ -67,14 +82,10 @@ class Cell {
         let col = this.colNum;
         let neighbours = [];
 
-        let top = undefined;
-        if (row !== 0) top = grid[row - 1][col];
-        let bottom = undefined;
-        if (row !== (grid.length - 1)) bottom = grid[row + 1][col];
-        let left = undefined;
-        if (col !== 0) left = grid[row][col - 1];
-        let right = undefined;
-        if (col !== (grid.length - 1)) right = grid[row][col+1];
+        let top = (row !== 0) ? grid[row - 1][col] : undefined;
+        let bottom = (row !== (grid.length - 1)) ? grid[row + 1][col] : undefined;
+        let left = (col !== 0) ? grid[row][col - 1] : undefined;
+        let right = (col !== (grid.length - 1)) ? grid[row][col+1] : undefined;
         
         if (top && !top.visited) neighbours.push(top);
         if (right && !right.visited) neighbours.push(right);
@@ -118,13 +129,14 @@ class Cell {
 
     highlight(columns) {
         let x = (this.colNum * this.parentSize) / (columns + 1);
-        let y = (this.rowNum * this.parentSize) / (rows + 1);
+        //let y = (this.rowNum * this.parentSize) / (rows + 1);
+        let y = (this.rowNum * this.parentSize) / (columns + 1);
         context.fillStyle = "purple";
         context.fillRect(x,y,this.parentSize/columns-3,this.parentSize/columns-3);
     }
 
-    removeWall(cell1,cell2) {
-        let x = cell1.colNum - cell2.colNum
+    removeWalls(cell1,cell2) {
+        let x = (cell1.colNum - cell2.colNum);
         if (x == 1) {
             cell1.walls.leftWall = false;
             cell2.walls.rightWall = false;
@@ -133,7 +145,7 @@ class Cell {
             cell2.walls.leftWall = false;
         }
 
-        let y = cell1.colNum - cell2.colNum;
+        let y = (cell1.colNum - cell2.colNum);
         if (y == 1) {
             cell1.walls.topWall = false;
             cell2.walls.bottomWall = false;
